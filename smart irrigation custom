@@ -1,0 +1,60 @@
+#include <ESP8266WiFi.h>
+#include <FirebaseESP8266.h>
+#include <DHT.h>
+
+// ====== Wi-Fi and Firebase Config ======
+#define WIFI_NAME "your-wifi-ssid"
+#define WIFI_PASS "your-wifi-password"
+#define FIREBASE_HOST "your-project-id.firebaseio.com"
+#define FIREBASE_AUTH "your-database-secret"
+
+// ====== Sensor Config ======
+#define DHT_PIN D4
+#define DHT_TYPE DHT11
+DHT dhtSensor(DHT_PIN, DHT_TYPE);
+
+// Firebase object
+FirebaseData fbData;
+
+// Soil moisture sensor
+#define SOIL_SENSOR_PIN A0
+int soilMoistureValue = 0;
+
+void connectWiFi() {
+  Serial.print("Connecting to Wi-Fi");
+  WiFi.begin(WIFI_NAME, WIFI_PASS);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(400);
+    Serial.print(".");
+  }
+  Serial.println(" connected!");
+}
+
+void sendToFirebase(float temperature, float humidity, int soilMoisture) {
+  Firebase.setFloat(fbData, "/field_data/temperature_celsius", temperature);
+  Firebase.setFloat(fbData, "/field_data/humidity_percent", humidity);
+  Firebase.setInt(fbData, "/field_data/soil_moisture", soilMoisture);
+}
+
+void setup() {
+  Serial.begin(115200);
+  connectWiFi();
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  dhtSensor.begin();
+}
+
+void loop() {
+  float temperatureC = dhtSensor.readTemperature();
+  float humidityPercent = dhtSensor.readHumidity();
+  soilMoistureValue = analogRead(SOIL_SENSOR_PIN);
+
+  if (!isnan(temperatureC) && !isnan(humidityPercent)) {
+    sendToFirebase(temperatureC, humidityPercent, soilMoistureValue);
+    Serial.println("Data sent: Temp=" + String(temperatureC) +
+                   "°C, Humidity=" + String(humidityPercent) +
+                   "%, Soil=" + String(soilMoistureValue));
+  } else {
+    Serial.println("Sensor read error. Retrying...");
+  }
+  delay(5000);
+}

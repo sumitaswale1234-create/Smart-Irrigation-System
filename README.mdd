@@ -1,0 +1,25 @@
+# Smart Irrigation System – GCP (Firebase) Prototype
+
+## Overview
+This project demonstrates the use of **Google Cloud Platform's Firebase Realtime Database** to collect and monitor environmental data for smart irrigation.  
+The system uses NodeMCU ESP8266, a DHT11 temperature/humidity sensor, and a soil moisture sensor. Data is sent to Firebase and can be accessed in real-time via a dashboard.
+
+## Hardware Components
+- NodeMCU ESP8266
+- DHT11 Sensor (Temperature & Humidity)
+- Soil Moisture Sensor
+- Jumper Wires
+- Breadboard
+- Power Supply
+
+## Features
+- Reads temperature (°C), humidity (%), and soil moisture level.
+- Sends data to Firebase Realtime Database on GCP every 5 seconds.
+- Wi-Fi connection handled automatically at startup.
+- Modular code with functions for connectivity and data upload.
+
+## GCP Services Used
+- **Firebase Realtime Database** – Stores sensor data for live access.
+- (Optional) **Firebase Hosting** – Can host a simple HTML dashboard.
+
+## Firebase Data Structure
